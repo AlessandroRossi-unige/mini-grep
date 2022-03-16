@@ -1,15 +1,19 @@
-use std::env;
+use std::{env, process};
+use mini_grep::Config;
 
 fn main() {
-    println!("Welcome to mini grep!");
+    eprintln!("Welcome to mini grep!");
 
-    let args: Vec<String> = env::args().collect();
-    if args.len() != 3 { panic!("You need two arguments!")};
+    let config = Config::new(env::args()).unwrap_or_else(|err| {
+        eprintln!("Problem passing arguments: {}", err);
+        process::exit(1);
+    });
+    eprintln!("String to grep: {}\nFile path: {}", config.query, config.file_name);
 
-    let grep_string = &args[1];
-    let file_name = &args[2];
-
-    println!("String to grep: {}\nFile path: {}", grep_string, file_name);
-
-
+    if let Err(e) = mini_grep::run(config) {
+        eprintln!("Application error: {}", e);
+        process::exit(1);
+    }
 }
+
+
